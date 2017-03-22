@@ -1,7 +1,9 @@
 package com.jukusoft.libgdx.rpg.network.netty;
 
 import com.jukusoft.libgdx.rpg.network.Server;
+import com.jukusoft.libgdx.rpg.network.message.NetMessage;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBufHolder;
 import io.netty.channel.*;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
@@ -14,7 +16,7 @@ import io.netty.util.concurrent.GlobalEventExecutor;
 /**
  * Created by Justin on 22.03.2017.
  */
-public abstract class NettyServer implements Server {
+public abstract class NettyServer<T extends ByteBufHolder> implements Server<T> {
 
     protected int nOfBossThreads = 1;
     protected int nOfWorkerThreads = 1;
@@ -129,6 +131,12 @@ public abstract class NettyServer implements Server {
 
     protected ChannelGroup getAllChannels () {
         return this.allChannels;
+    }
+
+    @Override
+    public void sendBroadcastMessage (T message) {
+        //send message to all clients
+        this.getAllChannels().writeAndFlush(message);
     }
 
 }

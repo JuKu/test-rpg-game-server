@@ -9,8 +9,13 @@ public class Main {
         //create new network client
         GameClient client = new GameClient(2);
 
-        //connect to server
-        client.connect("localhost", 55011);
+        try {
+            //connect to server
+            client.connect("localhost", 55011);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(0);
+        }
 
         if (!client.isConnected()) {
             throw new IllegalStateException("Could not connect to game server.");
