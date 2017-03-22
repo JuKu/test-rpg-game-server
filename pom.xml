@@ -13,6 +13,7 @@
         <module>game-network-library</module>
         <module>game-database</module>
         <module>game-server</module>
+        <module>game-network-client</module>
     </modules>
 
     <properties>

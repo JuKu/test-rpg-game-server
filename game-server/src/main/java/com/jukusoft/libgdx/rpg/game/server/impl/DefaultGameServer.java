@@ -3,8 +3,12 @@ package com.jukusoft.libgdx.rpg.game.server.impl;
 import com.hazelcast.core.HazelcastInstance;
 import com.jukusoft.libgdx.rpg.game.server.GameServer;
 import com.jukusoft.libgdx.rpg.game.server.config.ServerConfig;
+import com.jukusoft.libgdx.rpg.network.message.NetMessageDecoder;
+import com.jukusoft.libgdx.rpg.network.message.NetMessageEncoder;
 import com.jukusoft.libgdx.rpg.network.netty.NettyServer;
 import io.netty.channel.ChannelPipeline;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 
 /**
  * Created by Justin on 22.03.2017.
@@ -48,8 +52,15 @@ public class DefaultGameServer extends NettyServer implements GameServer {
         return this.channelInitializationHandler.countOpenConnections();
     }
 
-    @Override protected void initPipeline(ChannelPipeline channelPipeline) {
-        //
+    @Override protected void initPipeline(ChannelPipeline pipeline) {
+        LoggingHandler loggingHandler = new LoggingHandler("NetworkLogger", LogLevel.DEBUG);
+
+        //add logger to pipeline
+        pipeline.addLast("logger", loggingHandler);
+
+        //add encoder and decoder
+        pipeline.addLast("encoder", new NetMessageEncoder());
+        pipeline.addLast("decoder", new NetMessageDecoder());
     }
 
 }

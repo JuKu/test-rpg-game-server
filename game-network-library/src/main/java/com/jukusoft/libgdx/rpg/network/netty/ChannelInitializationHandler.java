@@ -28,12 +28,18 @@ public class ChannelInitializationHandler extends ChannelHandlerAdapter {
             throw e;
         }
 
+        //add channel to group
+        this.server.getAllChannels().add(ctx.channel());
+
         super.handlerAdded(ctx);
     }
 
     @Override
     public void handlerRemoved (ChannelHandlerContext ctx) throws Exception {
         this.openConnections--;
+
+        //remove channel from group
+        this.server.getAllChannels().remove(ctx.channel());
 
         super.handlerRemoved(ctx);
     }

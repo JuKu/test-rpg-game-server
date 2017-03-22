@@ -3,10 +3,13 @@ package com.jukusoft.libgdx.rpg.network.netty;
 import com.jukusoft.libgdx.rpg.network.Server;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
+import io.netty.channel.group.ChannelGroup;
+import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.util.concurrent.GlobalEventExecutor;
 
 /**
  * Created by Justin on 22.03.2017.
@@ -27,6 +30,8 @@ public abstract class NettyServer implements Server {
     protected LogLevel logLevel = LogLevel.INFO;
 
     protected ChannelInitializationHandler channelInitializationHandler = null;
+
+    protected ChannelGroup allChannels = null;
 
     public NettyServer (final int nOfBossThreads, final int nOfWorkerThreads) {
         this.nOfBossThreads = nOfBossThreads;
@@ -51,6 +56,8 @@ public abstract class NettyServer implements Server {
         //add handler
         bootstrap.handler(new LoggingHandler(this.logLevel));
         bootstrap.childHandler(this.channelInitializationHandler);
+
+        this.allChannels = new DefaultChannelGroup("all_channels", GlobalEventExecutor.INSTANCE);
     }
 
     @Override public void start(String interfaceName, int port) {
@@ -118,6 +125,10 @@ public abstract class NettyServer implements Server {
         bootstrap.childOption(ChannelOption.SO_KEEPALIVE, true);
         bootstrap.childOption(ChannelOption.AUTO_READ, true);
         bootstrap.childOption(ChannelOption.TCP_NODELAY, true);
+    }
+
+    protected ChannelGroup getAllChannels () {
+        return this.allChannels;
     }
 
 }
