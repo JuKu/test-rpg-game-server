@@ -94,7 +94,7 @@ public abstract class NettyClient implements Client {
     }
 
     @Override public boolean isConnected() {
-        return this.channel != null && this.isConnected();
+        return this.channel != null && this.channel.isActive();
     }
 
     @Override public Channel getChannel() {

@@ -6,7 +6,17 @@ package com.jukusoft.libgdx.rpg.game.client;
 public class Main {
 
     public static void main (String[] args) {
-        //
+        //create new network client
+        GameClient client = new GameClient(2);
+
+        //connect to server
+        client.connect("localhost", 55011);
+
+        if (!client.isConnected()) {
+            throw new IllegalStateException("Could not connect to game server.");
+        } else {
+            System.out.println("connection to game server established.");
+        }
     }
 
 }
