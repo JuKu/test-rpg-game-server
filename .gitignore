@@ -33,7 +33,7 @@ data/save/*
 *.log
 
 !testconfig.cfg
-server.cfg
+#server.cfg
 
 # Windows Installer files
 *.cab
@@ -160,3 +160,12 @@ release.properties
 
 # opengl
 *.cglsl
+game-database/src/main/resources/
+game-database/src/test/
+game-network-library/src/main/resources/
+game-network-library/src/test/
+game-server/cfg/server.cfg
+game-server/data/
+game-server/src/main/resources/
+game-server/src/test/
+src/
