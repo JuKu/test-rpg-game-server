@@ -1,4 +1,4 @@
-package com.jukusoft.libgdx.rpg.game.server;
+package com.jukusoft.libgdx.libgdx.rpg.game.server;
 
 /**
  * Created by Justin on 22.03.2017.

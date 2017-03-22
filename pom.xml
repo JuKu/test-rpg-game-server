@@ -8,9 +8,48 @@
     <artifactId>test-rpg-game-server</artifactId>
     <packaging>pom</packaging>
     <version>1.0.0-SNAPSHOT</version>
+
     <modules>
+        <module>game-network-library</module>
         <module>game-server</module>
+        <module>game-databases</module>
     </modules>
 
+    <properties>
+        <!-- source file encoding -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <java.version>1.8</java.version>
+
+        <!-- JUnit version -->
+        <junit.version>4.12</junit.version>
+
+        <ini4j.version>0.5.4</ini4j.version>
+
+        <slf4j.version>1.7.10</slf4j.version>
+
+        <!-- netty network library version -->
+        <netty.version>4.1.9.Final</netty.version>
+
+        <!-- hazelcast distributed In-Memory-Data Grid / database -->
+        <hazelcast.version>3.8</hazelcast.version>
+
+        <!-- bugfix, Doing so will allow JaCoCo to set its agent properly. Otherwise the JVM may crash while tests are running, see https://docs.sonarqube.org/display/PLUG/Usage+of+JaCoCo+with+Java+Plugin -->
+        <argLine>-Xmx128m</argLine>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
