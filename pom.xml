@@ -11,8 +11,8 @@
 
     <modules>
         <module>game-network-library</module>
+        <module>game-database</module>
         <module>game-server</module>
-        <module>game-databases</module>
     </modules>
 
     <properties>
