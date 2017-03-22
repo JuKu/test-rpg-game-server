@@ -23,6 +23,18 @@ public class ServerMain {
 
         //start game server
         server.start();
+
+        System.out.println("server started.");
+
+        while (true) {
+            System.out.println("open connections: " + server.countOpenConnections());
+
+            try {
+                Thread.sleep(60000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }

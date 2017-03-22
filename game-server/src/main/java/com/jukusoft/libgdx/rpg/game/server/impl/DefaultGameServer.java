@@ -40,6 +40,14 @@ public class DefaultGameServer extends NettyServer implements GameServer {
         this.shutdownServer();
     }
 
+    @Override public int getPort() {
+        return this.config.getPort();
+    }
+
+    @Override public int countOpenConnections() {
+        return this.channelInitializationHandler.countOpenConnections();
+    }
+
     @Override protected void initPipeline(ChannelPipeline channelPipeline) {
         //
     }

@@ -24,7 +24,7 @@ public class ServerConfig {
     }
 
     public boolean isInterfaceSpecified () {
-        return !this.interfaceName.isEmpty() || !this.interfaceName.contains("none") || !this.interfaceName.contains("all");
+        return !this.interfaceName.isEmpty() && !this.interfaceName.contains("none") && !this.interfaceName.contains("all");
     }
 
     public String getInterfaceName () {

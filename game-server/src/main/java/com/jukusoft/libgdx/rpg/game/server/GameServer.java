@@ -9,4 +9,8 @@ public interface GameServer {
 
     public void shutdown ();
 
+    public int getPort ();
+
+    public int countOpenConnections ();
+
 }
