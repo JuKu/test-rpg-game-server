@@ -1,6 +1,7 @@
 package com.jukusoft.libgdx.rpg.game.server.handler;
 
 import com.jukusoft.libgdx.rpg.game.server.listener.ConnectionClosedListener;
+import com.jukusoft.libgdx.rpg.game.server.listener.ConnectionInitListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
@@ -17,9 +18,13 @@ public class InitHandler extends ChannelInboundHandlerAdapter {
     protected AtomicLong connID = new AtomicLong(0);
 
     protected ConnectionClosedListener closedListener = null;
+    protected ConnectionInitListener initListener = null;
 
-    public InitHandler (long connID) {
+    protected boolean isInitialized = false;
+
+    public InitHandler (long connID, ConnectionInitListener initListener) {
         this.connID.set(connID);
+        this.initListener = initListener;
     }
 
     public void setClosedListener (ConnectionClosedListener closedListener) {
@@ -37,6 +42,11 @@ public class InitHandler extends ChannelInboundHandlerAdapter {
     }
 
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        if (!isInitialized) {
+            //call initialization listener
+            initListener.onConnectinInit(connID.get(), ctx);
+        }
+
         super.channelActive(ctx);
     }
 

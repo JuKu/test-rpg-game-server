@@ -5,9 +5,11 @@ import com.hazelcast.core.IdGenerator;
 import com.jukusoft.libgdx.rpg.game.server.GameServer;
 import com.jukusoft.libgdx.rpg.game.server.config.ServerConfig;
 import com.jukusoft.libgdx.rpg.game.server.handler.InitHandler;
+import com.jukusoft.libgdx.rpg.game.server.message.VersionMessageFactory;
 import com.jukusoft.libgdx.rpg.network.message.NetMessageDecoder;
 import com.jukusoft.libgdx.rpg.network.message.NetMessageEncoder;
 import com.jukusoft.libgdx.rpg.network.netty.NettyServer;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
@@ -24,6 +26,8 @@ public class DefaultGameServer extends NettyServer implements GameServer {
     protected ServerConfig config = null;
 
     protected IdGenerator connIDGenerator = null;
+    protected int version = 1;
+    protected String versionStr = "1.0.0";
 
     public DefaultGameServer (HazelcastInstance hazelcastInstance, ServerConfig config) {
         super(DEFAULT_NUMBER_OF_BOSS_THREADS, DEFAULT_NUMBER_OF_WORKER_THREADS);
@@ -59,6 +63,11 @@ public class DefaultGameServer extends NettyServer implements GameServer {
         return this.channelInitializationHandler.countOpenConnections();
     }
 
+    @Override public void setVersion(int version, String versionStr) {
+        this.version = version;
+        this.versionStr = versionStr;
+    }
+
     @Override protected void initPipeline(ChannelPipeline pipeline) {
         LoggingHandler loggingHandler = new LoggingHandler("NetworkLogger", LogLevel.DEBUG);
 
@@ -73,7 +82,12 @@ public class DefaultGameServer extends NettyServer implements GameServer {
         long connID = this.connIDGenerator.newId();
 
         //add init handler
-        pipeline.addLast("initHandler", new InitHandler(connID));
+        pipeline.addLast("initHandler", new InitHandler(connID, (long id, ChannelHandlerContext ctx) -> {
+            System.out.println("client connection (ID: " + id + ") opened.");
+
+            //send version message
+            ctx.writeAndFlush(VersionMessageFactory.createMessage(this.version, this.versionStr));
+        }));
     }
 
 }

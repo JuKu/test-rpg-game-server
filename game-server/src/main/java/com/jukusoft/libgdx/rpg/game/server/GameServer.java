@@ -13,4 +13,6 @@ public interface GameServer {
 
     public int countOpenConnections ();
 
+    public void setVersion (int version, String versionStr);
+
 }
