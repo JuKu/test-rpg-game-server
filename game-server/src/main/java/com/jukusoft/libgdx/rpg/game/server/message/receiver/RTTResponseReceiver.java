@@ -2,6 +2,7 @@ package com.jukusoft.libgdx.rpg.game.server.message.receiver;
 
 import com.jukusoft.libgdx.rpg.game.client.ClientMessageID;
 import com.jukusoft.libgdx.rpg.game.server.message.PingMessageFactory;
+import com.jukusoft.libgdx.rpg.game.server.message.RTTMessageFactory;
 import com.jukusoft.libgdx.rpg.network.channel.ChannelAttributes;
 import com.jukusoft.libgdx.rpg.network.message.MessageReceiver;
 import com.jukusoft.libgdx.rpg.network.message.NetMessage;
@@ -38,6 +39,10 @@ public class RTTResponseReceiver implements MessageReceiver<NetMessage> {
 
             //send ping info message
             ctx.writeAndFlush(PingMessageFactory.createMessage(ping));
+        } else if (msg.getEventID() == ClientMessageID.REQUEST_PING_CHECK_EVENTID) {
+            System.out.println("client requested an ping check.");
+
+            ctx.writeAndFlush(RTTMessageFactory.createMessage());
         } else {
             throw new IllegalStateException("unknown message eventID: " + msg.getEventID());
         }

@@ -15,6 +15,8 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Created by Justin on 22.03.2017.
  */
@@ -76,6 +78,10 @@ public class GameClient extends NettyClient {
         System.out.println("request ping check.");
 
         this.send(PingCheckMessageFactory.createMessage());
+    }
+
+    public void addTask (long interval, Runnable runnable) {
+        this.workerGroup.scheduleAtFixedRate(runnable, 0l, interval, TimeUnit.MILLISECONDS);
     }
 
 }

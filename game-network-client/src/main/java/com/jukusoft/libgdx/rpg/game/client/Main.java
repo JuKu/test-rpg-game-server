@@ -23,10 +23,10 @@ public class Main {
             System.out.println("connection to game server established.");
         }
 
-        Thread.sleep(10000);
-
-        //request an ping check to get current ping
-        client.requestPingCheck();
+        //add ping check every 2 seconds
+        client.addTask(2000l, () -> {
+            client.requestPingCheck();
+        });
     }
 
 }

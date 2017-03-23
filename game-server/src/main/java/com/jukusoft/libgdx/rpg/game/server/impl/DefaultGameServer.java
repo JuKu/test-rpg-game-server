@@ -113,7 +113,9 @@ public class DefaultGameServer extends NettyServer implements GameServer {
         //create message distributor
         MessageDistributor messageDistributor = new DefaultMessageDistributor(attributes);
 
-        messageDistributor.addReceiver(ClientMessageID.RTT_RESPONSE_EVENTID, new RTTResponseReceiver());
+        RTTResponseReceiver rttResponseReceiver = new RTTResponseReceiver();
+        messageDistributor.addReceiver(ClientMessageID.RTT_RESPONSE_EVENTID, rttResponseReceiver);
+        messageDistributor.addReceiver(ClientMessageID.REQUEST_PING_CHECK_EVENTID, rttResponseReceiver);
 
         //add message distributor to pipeline
         pipeline.addLast("handler", messageDistributor);
