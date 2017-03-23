@@ -73,6 +73,8 @@ public class GameClient extends NettyClient {
     * request server to check client ping
     */
     public void requestPingCheck () {
+        System.out.println("request ping check.");
+
         this.send(PingCheckMessageFactory.createMessage());
     }
 

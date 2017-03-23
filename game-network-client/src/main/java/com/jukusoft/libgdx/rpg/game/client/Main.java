@@ -5,7 +5,7 @@ package com.jukusoft.libgdx.rpg.game.client;
  */
 public class Main {
 
-    public static void main (String[] args) {
+    public static void main (String[] args) throws InterruptedException {
         //create new network client
         GameClient client = new GameClient(2);
 
@@ -22,6 +22,11 @@ public class Main {
         } else {
             System.out.println("connection to game server established.");
         }
+
+        Thread.sleep(10000);
+
+        //request an ping check to get current ping
+        client.requestPingCheck();
     }
 
 }
