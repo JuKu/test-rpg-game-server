@@ -55,6 +55,9 @@ public class InitHandler extends ChannelInboundHandlerAdapter {
 
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         if (!isInitialized) {
+            //set channel opened timestamp
+            this.channelAttributes.put("channel_opened_timestamp", System.currentTimeMillis());
+
             //call initialization listener
             initListener.onConnectinInit(connID.get(), ctx);
         }
@@ -87,6 +90,9 @@ public class InitHandler extends ChannelInboundHandlerAdapter {
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         if (cause.getLocalizedMessage().contains("Eine vorhandene Verbindung wurde vom Remotehost geschlossen")) {
             System.out.println("connection closed (ID: " + connID + ").");
+
+            //logout user
+            channelAttributes.logout();
 
             if (this.closedListener != null) {
                 //call listener
