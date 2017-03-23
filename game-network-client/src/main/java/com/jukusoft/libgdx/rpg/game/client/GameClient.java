@@ -1,5 +1,8 @@
 package com.jukusoft.libgdx.rpg.game.client;
 
+import com.jukusoft.libgdx.rpg.game.client.message.PingCheckMessageFactory;
+import com.jukusoft.libgdx.rpg.game.client.message.receiver.RTTReceiver;
+import com.jukusoft.libgdx.rpg.game.server.ServerMessageID;
 import com.jukusoft.libgdx.rpg.network.channel.ChannelAttributes;
 import com.jukusoft.libgdx.rpg.network.channel.ClientChannelAttributes;
 import com.jukusoft.libgdx.rpg.network.message.MessageDistributor;
@@ -28,6 +31,12 @@ public class GameClient extends NettyClient {
 
         //create message distributor
         this.messageDistributor = new DefaultMessageDistributor(attributes);
+
+        RTTReceiver rttReceiver = new RTTReceiver();
+
+        //add RTT receiver
+        this.messageDistributor.addReceiver(ServerMessageID.RTT_MESSAGE_EVENTID, rttReceiver);
+        this.messageDistributor.addReceiver(ServerMessageID.PING_INFO_EVENTID, rttReceiver);
     }
 
     @Override protected void initPipeline(ChannelPipeline pipeline) {
@@ -42,6 +51,29 @@ public class GameClient extends NettyClient {
 
         //add message distributor to pipeline
         pipeline.addLast("handler", messageDistributor);
+    }
+
+    public ChannelAttributes getAttributes () {
+        return this.attributes;
+    }
+
+    public MessageDistributor<NetMessage> getMessageDistributor () {
+        return this.messageDistributor;
+    }
+
+    public void send (NetMessage message) {
+        if (!isConnected()) {
+            throw new IllegalStateException("Cannot send message, because client isnt connected.");
+        }
+
+        this.channel.writeAndFlush(message);
+    }
+
+    /**
+    * request server to check client ping
+    */
+    public void requestPingCheck () {
+        this.send(PingCheckMessageFactory.createMessage());
     }
 
 }

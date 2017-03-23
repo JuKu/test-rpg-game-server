@@ -15,6 +15,8 @@ public class ChannelAttributes {
     protected Map<String,Object> attrMap = new ConcurrentHashMap<>();
 
     protected AtomicBoolean isAuth = new AtomicBoolean(false);
+    protected volatile long rtt = 0;
+    protected volatile int ping = 0;
 
     public ChannelAttributes (long connID) {
         this.connID = connID;
@@ -60,6 +62,22 @@ public class ChannelAttributes {
 
     public void logout () {
         this.isAuth.set(false);
+    }
+
+    public long getRTT () {
+        return this.rtt;
+    }
+
+    public void setRTT (long rtt) {
+        this.rtt = rtt;
+    }
+
+    public int getPing () {
+        return this.ping;
+    }
+
+    public void setPing (int ping) {
+        this.ping = ping;
     }
 
 }

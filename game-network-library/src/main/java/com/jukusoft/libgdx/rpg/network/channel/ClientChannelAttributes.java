@@ -10,4 +10,9 @@ public class ClientChannelAttributes extends ChannelAttributes {
         super(1);
     }
 
+    @Override
+    public void setRTT (long rtt) {
+        throw new UnsupportedOperationException("client doesnt support RTT.");
+    }
+
 }

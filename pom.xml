@@ -14,6 +14,7 @@
         <module>game-database</module>
         <module>game-server</module>
         <module>game-network-client</module>
+        <module>game-shared</module>
     </modules>
 
     <properties>

@@ -2,11 +2,13 @@ package com.jukusoft.libgdx.rpg.game.server.impl;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IdGenerator;
+import com.jukusoft.libgdx.rpg.game.client.ClientMessageID;
 import com.jukusoft.libgdx.rpg.game.server.GameServer;
 import com.jukusoft.libgdx.rpg.game.server.config.ServerConfig;
 import com.jukusoft.libgdx.rpg.game.server.handler.InitHandler;
 import com.jukusoft.libgdx.rpg.game.server.message.RTTMessageFactory;
 import com.jukusoft.libgdx.rpg.game.server.message.VersionMessageFactory;
+import com.jukusoft.libgdx.rpg.game.server.message.receiver.RTTResponseReceiver;
 import com.jukusoft.libgdx.rpg.network.channel.ChannelAttributes;
 import com.jukusoft.libgdx.rpg.network.channel.ChannelAttributesManager;
 import com.jukusoft.libgdx.rpg.network.channel.impl.DefaultChannelAttributesManager;
@@ -27,6 +29,9 @@ public class DefaultGameServer extends NettyServer implements GameServer {
 
     protected static final int DEFAULT_NUMBER_OF_BOSS_THREADS = 1;
     protected static final int DEFAULT_NUMBER_OF_WORKER_THREADS = 1;
+
+    //length of one tick in ms
+    public static final long TICK_LENGTH = 50;
 
     protected HazelcastInstance hazelcastInstance = null;
     protected ServerConfig config = null;
@@ -107,6 +112,8 @@ public class DefaultGameServer extends NettyServer implements GameServer {
 
         //create message distributor
         MessageDistributor messageDistributor = new DefaultMessageDistributor(attributes);
+
+        messageDistributor.addReceiver(ClientMessageID.RTT_RESPONSE_EVENTID, new RTTResponseReceiver());
 
         //add message distributor to pipeline
         pipeline.addLast("handler", messageDistributor);
