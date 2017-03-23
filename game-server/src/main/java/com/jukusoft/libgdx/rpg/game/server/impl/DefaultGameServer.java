@@ -5,7 +5,10 @@ import com.hazelcast.core.IdGenerator;
 import com.jukusoft.libgdx.rpg.game.server.GameServer;
 import com.jukusoft.libgdx.rpg.game.server.config.ServerConfig;
 import com.jukusoft.libgdx.rpg.game.server.handler.InitHandler;
+import com.jukusoft.libgdx.rpg.game.server.message.RTTMessageFactory;
 import com.jukusoft.libgdx.rpg.game.server.message.VersionMessageFactory;
+import com.jukusoft.libgdx.rpg.network.channel.ChannelAttributesManager;
+import com.jukusoft.libgdx.rpg.network.channel.impl.DefaultChannelAttributesManager;
 import com.jukusoft.libgdx.rpg.network.message.NetMessageDecoder;
 import com.jukusoft.libgdx.rpg.network.message.NetMessageEncoder;
 import com.jukusoft.libgdx.rpg.network.netty.NettyServer;
@@ -29,6 +32,8 @@ public class DefaultGameServer extends NettyServer implements GameServer {
     protected int version = 1;
     protected String versionStr = "1.0.0";
 
+    protected ChannelAttributesManager channelAttributesManager = null;
+
     public DefaultGameServer (HazelcastInstance hazelcastInstance, ServerConfig config) {
         super(DEFAULT_NUMBER_OF_BOSS_THREADS, DEFAULT_NUMBER_OF_WORKER_THREADS);
 
@@ -37,6 +42,8 @@ public class DefaultGameServer extends NettyServer implements GameServer {
 
         //get ID generator
         this.connIDGenerator = this.hazelcastInstance.getIdGenerator("connection-id-generator");
+
+        this.channelAttributesManager = new DefaultChannelAttributesManager();
     }
 
     @Override
@@ -82,11 +89,14 @@ public class DefaultGameServer extends NettyServer implements GameServer {
         long connID = this.connIDGenerator.newId();
 
         //add init handler
-        pipeline.addLast("initHandler", new InitHandler(connID, (long id, ChannelHandlerContext ctx) -> {
+        pipeline.addLast("initHandler", new InitHandler(connID, this.channelAttributesManager, (long id, ChannelHandlerContext ctx) -> {
             System.out.println("client connection (ID: " + id + ") opened.");
 
             //send version message
             ctx.writeAndFlush(VersionMessageFactory.createMessage(this.version, this.versionStr));
+
+            //send RTT message to check ping
+            ctx.writeAndFlush(RTTMessageFactory.createMessage());
         }));
     }
 

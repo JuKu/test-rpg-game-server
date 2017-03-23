@@ -7,4 +7,7 @@ public class MessageID {
 
     public static final int VERSION_MESSAGE_EVENTID = 1;
 
+    //round trip time message
+    public static final int RTT_MESSAGE_EVENTID = 2;
+
 }

@@ -2,6 +2,8 @@ package com.jukusoft.libgdx.rpg.game.server.handler;
 
 import com.jukusoft.libgdx.rpg.game.server.listener.ConnectionClosedListener;
 import com.jukusoft.libgdx.rpg.game.server.listener.ConnectionInitListener;
+import com.jukusoft.libgdx.rpg.network.channel.ChannelAttributes;
+import com.jukusoft.libgdx.rpg.network.channel.ChannelAttributesManager;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
@@ -20,11 +22,18 @@ public class InitHandler extends ChannelInboundHandlerAdapter {
     protected ConnectionClosedListener closedListener = null;
     protected ConnectionInitListener initListener = null;
 
+    protected ChannelAttributesManager channelAttributesManager = null;
+    protected ChannelAttributes channelAttributes = null;
+
     protected boolean isInitialized = false;
 
-    public InitHandler (long connID, ConnectionInitListener initListener) {
+    public InitHandler (long connID, ChannelAttributesManager channelAttributesManager, ConnectionInitListener initListener) {
         this.connID.set(connID);
         this.initListener = initListener;
+
+        //get channel attributes
+        this.channelAttributesManager = channelAttributesManager;
+        this.channelAttributes = channelAttributesManager.getAttributes(connID);
     }
 
     public void setClosedListener (ConnectionClosedListener closedListener) {
@@ -38,6 +47,9 @@ public class InitHandler extends ChannelInboundHandlerAdapter {
     }
 
     public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
+        //remove channel attributes
+        this.channelAttributesManager.removeChannel(connID.get());
+
         super.channelUnregistered(ctx);
     }
 

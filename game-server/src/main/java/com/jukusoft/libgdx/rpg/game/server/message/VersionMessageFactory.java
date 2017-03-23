@@ -2,7 +2,7 @@ package com.jukusoft.libgdx.rpg.game.server.message;
 
 import com.jukusoft.libgdx.rpg.network.message.NetMessage;
 import com.jukusoft.libgdx.rpg.network.utils.ByteUtils;
-import com.jukusoft.libgdx.rpg.network.utils.TileUtils;
+import com.jukusoft.libgdx.rpg.network.utils.TimeUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
@@ -25,7 +25,7 @@ public class VersionMessageFactory {
         byteBuf.writeInt(bytes.length);
         byteBuf.writeBytes(bytes);
 
-        return new NetMessage(MessageID.VERSION_MESSAGE_EVENTID, 1, TileUtils.getCurrentTime(), byteBuf);
+        return new NetMessage(MessageID.VERSION_MESSAGE_EVENTID, 1, TimeUtils.getCurrentTime(), byteBuf);
     }
 
 }
