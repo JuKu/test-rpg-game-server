@@ -3,6 +3,7 @@ package com.jukusoft.libgdx.rpg.game.client;
 import com.jukusoft.libgdx.rpg.network.channel.ChannelAttributes;
 import com.jukusoft.libgdx.rpg.network.channel.ClientChannelAttributes;
 import com.jukusoft.libgdx.rpg.network.message.MessageDistributor;
+import com.jukusoft.libgdx.rpg.network.message.NetMessage;
 import com.jukusoft.libgdx.rpg.network.message.NetMessageDecoder;
 import com.jukusoft.libgdx.rpg.network.message.NetMessageEncoder;
 import com.jukusoft.libgdx.rpg.network.message.impl.DefaultMessageDistributor;
@@ -16,8 +17,17 @@ import io.netty.handler.logging.LoggingHandler;
  */
 public class GameClient extends NettyClient {
 
+    protected ChannelAttributes attributes = null;
+    protected MessageDistributor<NetMessage> messageDistributor = null;
+
     public GameClient(int nOfWorkerThreads) {
         super(nOfWorkerThreads);
+
+        //create channel attributes
+        this.attributes = new ClientChannelAttributes();
+
+        //create message distributor
+        this.messageDistributor = new DefaultMessageDistributor(attributes);
     }
 
     @Override protected void initPipeline(ChannelPipeline pipeline) {
@@ -29,12 +39,6 @@ public class GameClient extends NettyClient {
         //add encoder and decoder
         pipeline.addLast("encoder", new NetMessageEncoder());
         pipeline.addLast("decoder", new NetMessageDecoder());
-
-        //create channel attributes
-        ChannelAttributes attributes = new ClientChannelAttributes();
-
-        //create message distributor
-        MessageDistributor messageDistributor = new DefaultMessageDistributor(attributes);
 
         //add message distributor to pipeline
         pipeline.addLast("handler", messageDistributor);
