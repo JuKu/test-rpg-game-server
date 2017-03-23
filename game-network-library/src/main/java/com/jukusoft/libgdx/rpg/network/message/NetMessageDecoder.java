@@ -41,6 +41,10 @@ public class NetMessageDecoder extends ByteToMessageDecoder {
             content.retain();
 
             NetMessage message = new NetMessage(eventID, version, timestamp, content);
+
+            //set content length
+            message.setContentLengthInBytes(length - NetMessage.HEADER_LENGHT);
+
             out.add(message);
         } catch (Exception e) {
             throw e;

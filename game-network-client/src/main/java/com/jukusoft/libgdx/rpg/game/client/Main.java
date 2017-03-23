@@ -27,6 +27,23 @@ public class Main {
         client.addTask(2000l, () -> {
             client.requestPingCheck();
         });
+
+        //set authentification listener
+        client.setAuthListener((boolean success, int errorCode, String message) -> {
+            if (success) {
+                System.out.println("authentification successful.");
+            } else {
+                System.out.println("authentification failed.");
+            }
+        });
+
+        //try to authorize user
+        //client.authUser("test", "test1234");
+
+        //send player position every 20ms to server
+        client.addTask(20l, () -> {
+            client.sendPlayerPosition(1, 1, 1, 40, 40, 0, 1);
+        });
     }
 
 }

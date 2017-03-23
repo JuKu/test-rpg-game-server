@@ -15,4 +15,6 @@ public class ServerMessageID {
     //send current ping to client
     public static final int PING_INFO_EVENTID = 3;
 
+    public static final int AUTH_USER_RESPONSE_EVENTID = 4;
+
 }

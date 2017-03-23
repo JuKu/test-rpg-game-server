@@ -42,7 +42,14 @@ public class DefaultMessageDistributor extends SimpleChannelInboundHandler<NetMe
         MessageReceiver<NetMessage> receiver = receiverMap.get(msg.getEventID());
 
         if (receiver == null) {
-            System.err.println("no receiver found for message eventID: " + msg.getEventID());
+            System.err.println("no receiver found for message eventID: " + msg.getEventID() + ", skip " + msg.getContentLengthInBytes() + " bytes.");
+
+            for (int i = 0; i < msg.getContentLengthInBytes(); i++) {
+                //read bytes from discarded message
+                msg.content().readByte();
+            }
+
+            return;
         } else {
             //call message receiver
             receiver.onReceive(ctx, attributes.getChannelID(), this.attributes, msg);

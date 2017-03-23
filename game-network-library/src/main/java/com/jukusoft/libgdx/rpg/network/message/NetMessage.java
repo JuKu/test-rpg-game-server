@@ -21,6 +21,8 @@ public class NetMessage extends DefaultByteBufHolder {
 
     protected final long timestamp;
 
+    protected int contentLengthInBytes;
+
     /**
      * Constructor which creates a new message and
      * sets the type, version and content.
@@ -38,6 +40,9 @@ public class NetMessage extends DefaultByteBufHolder {
         this.eventID = eventID;
         this.version = version;
         this.timestamp = timestamp;
+
+        this.contentLengthInBytes = content.readableBytes();
+        //System.out.println("send " + contentLengthInBytes + " bytes.");
     }
 
     /**
@@ -67,6 +72,14 @@ public class NetMessage extends DefaultByteBufHolder {
 
     public int getHeaderLenght () {
         return HEADER_LENGHT;
+    }
+
+    public int getContentLengthInBytes () {
+        return this.contentLengthInBytes;
+    }
+
+    protected void setContentLengthInBytes (int length) {
+        this.contentLengthInBytes = length;
     }
 
     @Override

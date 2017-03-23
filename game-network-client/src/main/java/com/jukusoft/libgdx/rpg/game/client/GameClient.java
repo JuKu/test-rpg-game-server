@@ -1,6 +1,9 @@
 package com.jukusoft.libgdx.rpg.game.client;
 
+import com.jukusoft.libgdx.rpg.game.client.listener.AuthListener;
 import com.jukusoft.libgdx.rpg.game.client.message.PingCheckMessageFactory;
+import com.jukusoft.libgdx.rpg.game.client.message.PlayerPosMessageFactory;
+import com.jukusoft.libgdx.rpg.game.client.message.UserAuthMessageFactory;
 import com.jukusoft.libgdx.rpg.game.client.message.receiver.RTTReceiver;
 import com.jukusoft.libgdx.rpg.game.server.ServerMessageID;
 import com.jukusoft.libgdx.rpg.network.channel.ChannelAttributes;
@@ -24,6 +27,8 @@ public class GameClient extends NettyClient {
 
     protected ChannelAttributes attributes = null;
     protected MessageDistributor<NetMessage> messageDistributor = null;
+
+    protected AuthListener authListener = null;
 
     public GameClient(int nOfWorkerThreads) {
         super(nOfWorkerThreads);
@@ -78,6 +83,27 @@ public class GameClient extends NettyClient {
         System.out.println("request ping check.");
 
         this.send(PingCheckMessageFactory.createMessage());
+    }
+
+    public void sendPlayerPosition (long sectorID, int layerID, long instanceID, float x, float y, float angle, float speed) {
+        //System.out.println("send player position");
+
+        this.send(PlayerPosMessageFactory.createMessage(sectorID, layerID, instanceID, x, y, angle, speed));
+    }
+
+    public void setAuthListener (AuthListener listener) {
+        this.authListener = listener;
+    }
+
+    public void authUser (String username, String password) {
+        if (authListener == null) {
+            throw new IllegalStateException("set authListener first.");
+        }
+
+        System.out.println("try to authorize user '" + username + "'.");
+
+        //try to authentificate user
+        this.send(UserAuthMessageFactory.createMessage(username, password));
     }
 
     public void addTask (long interval, Runnable runnable) {
