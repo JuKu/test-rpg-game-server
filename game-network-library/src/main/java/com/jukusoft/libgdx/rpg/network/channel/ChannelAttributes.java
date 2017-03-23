@@ -20,6 +20,10 @@ public class ChannelAttributes {
         this.connID = connID;
     }
 
+    public long getChannelID () {
+        return this.connID;
+    }
+
     public void put (String key, Object obj) {
         this.attrMap.put(key, obj);
     }

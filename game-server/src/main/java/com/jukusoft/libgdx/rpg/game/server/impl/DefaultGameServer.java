@@ -7,10 +7,13 @@ import com.jukusoft.libgdx.rpg.game.server.config.ServerConfig;
 import com.jukusoft.libgdx.rpg.game.server.handler.InitHandler;
 import com.jukusoft.libgdx.rpg.game.server.message.RTTMessageFactory;
 import com.jukusoft.libgdx.rpg.game.server.message.VersionMessageFactory;
+import com.jukusoft.libgdx.rpg.network.channel.ChannelAttributes;
 import com.jukusoft.libgdx.rpg.network.channel.ChannelAttributesManager;
 import com.jukusoft.libgdx.rpg.network.channel.impl.DefaultChannelAttributesManager;
+import com.jukusoft.libgdx.rpg.network.message.MessageDistributor;
 import com.jukusoft.libgdx.rpg.network.message.NetMessageDecoder;
 import com.jukusoft.libgdx.rpg.network.message.NetMessageEncoder;
+import com.jukusoft.libgdx.rpg.network.message.impl.DefaultMessageDistributor;
 import com.jukusoft.libgdx.rpg.network.netty.NettyServer;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
@@ -88,6 +91,9 @@ public class DefaultGameServer extends NettyServer implements GameServer {
         //generate new connection ID
         long connID = this.connIDGenerator.newId();
 
+        //get channel attributes
+        ChannelAttributes attributes = this.channelAttributesManager.getAttributes(connID);
+
         //add init handler
         pipeline.addLast("initHandler", new InitHandler(connID, this.channelAttributesManager, (long id, ChannelHandlerContext ctx) -> {
             System.out.println("client connection (ID: " + id + ") opened.");
@@ -98,6 +104,12 @@ public class DefaultGameServer extends NettyServer implements GameServer {
             //send RTT message to check ping
             ctx.writeAndFlush(RTTMessageFactory.createMessage());
         }));
+
+        //create message distributor
+        MessageDistributor messageDistributor = new DefaultMessageDistributor(attributes);
+
+        //add message distributor to pipeline
+        pipeline.addLast("handler", messageDistributor);
     }
 
 }
