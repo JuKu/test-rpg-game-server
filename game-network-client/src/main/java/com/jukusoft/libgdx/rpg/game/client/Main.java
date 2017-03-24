@@ -38,7 +38,7 @@ public class Main {
         });
 
         //try to authorize user
-        client.authUser("test", "test1234");
+        client.authUser("test", "test1234", 1000);
 
         //send player position every 20ms to server
         client.addTask(20l, () -> {

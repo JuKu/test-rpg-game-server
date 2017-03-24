@@ -11,4 +11,6 @@ public class AuthErrorCode {
 
     public static final int AUTH_USER_DOESNT_EXISTS = 2;
 
+    public static final int AUTH_CONNECTION_TIMEOUT = 3;
+
 }

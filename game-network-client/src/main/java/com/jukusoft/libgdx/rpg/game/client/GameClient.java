@@ -6,6 +6,7 @@ import com.jukusoft.libgdx.rpg.game.client.message.PlayerPosMessageFactory;
 import com.jukusoft.libgdx.rpg.game.client.message.UserAuthMessageFactory;
 import com.jukusoft.libgdx.rpg.game.client.message.receiver.AuthResponseReceiver;
 import com.jukusoft.libgdx.rpg.game.client.message.receiver.RTTReceiver;
+import com.jukusoft.libgdx.rpg.game.server.AuthErrorCode;
 import com.jukusoft.libgdx.rpg.game.server.ServerMessageID;
 import com.jukusoft.libgdx.rpg.network.channel.ChannelAttributes;
 import com.jukusoft.libgdx.rpg.network.channel.ClientChannelAttributes;
@@ -28,6 +29,7 @@ public class GameClient extends NettyClient {
     protected MessageDistributor<NetMessage> messageDistributor = null;
 
     protected AuthListener authListener = null;
+    protected boolean authMessageReceived = false;
 
     public GameClient(int nOfWorkerThreads) {
         super(nOfWorkerThreads);
@@ -47,6 +49,8 @@ public class GameClient extends NettyClient {
         //add auth response receiver
         AuthResponseReceiver authResponseReceiver = new AuthResponseReceiver((boolean success, int errorCode, long userID, String message) -> {
             System.out.println("auth response received (success: " + success + ", errorCode: " + errorCode + ").");
+
+            this.authMessageReceived = true;
 
             if (this.authListener != null) {
                 //call listener
@@ -115,15 +119,25 @@ public class GameClient extends NettyClient {
         this.authListener = listener;
     }
 
-    public void authUser (String username, String password) {
+    public void authUser (String username, String password, long timeout) {
         if (authListener == null) {
             throw new IllegalStateException("set authListener first.");
         }
+
+        //reset flag
+        this.authMessageReceived = false;
 
         //hash password
         password = HashUtils.computePasswordSHAHash(password);
 
         System.out.println("try to authorize user '" + username + "'.");
+
+        workerGroup.schedule(() -> {
+            if (!this.authMessageReceived) {
+                //call listener
+                this.authListener.onAuth(false, AuthErrorCode.AUTH_CONNECTION_TIMEOUT, 0, "CONNECTION_TIMEOUT");
+            }
+        }, timeout, TimeUnit.MILLISECONDS);
 
         //try to authentificate user
         this.send(UserAuthMessageFactory.createMessage(username, password));
