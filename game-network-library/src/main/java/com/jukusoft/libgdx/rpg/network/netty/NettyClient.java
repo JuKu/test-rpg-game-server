@@ -109,6 +109,7 @@ public abstract class NettyClient implements Client {
 
     protected abstract void initPipeline (ChannelPipeline pipeline);
 
+    @ChannelHandler.Sharable
     private final class ClientChannelInitializationHandler extends ChannelHandlerAdapter {
         @Override
         public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
