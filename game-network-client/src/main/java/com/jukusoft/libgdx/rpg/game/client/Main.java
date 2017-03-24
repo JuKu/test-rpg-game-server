@@ -29,16 +29,16 @@ public class Main {
         });
 
         //set authentification listener
-        client.setAuthListener((boolean success, int errorCode, String message) -> {
+        client.setAuthListener((boolean success, int errorCode, long userID, String message) -> {
             if (success) {
-                System.out.println("authentification successful.");
+                System.out.println("authentification successful, userID: " + userID);
             } else {
                 System.out.println("authentification failed.");
             }
         });
 
         //try to authorize user
-        //client.authUser("test", "test1234");
+        client.authUser("test", "test1234");
 
         //send player position every 20ms to server
         client.addTask(20l, () -> {

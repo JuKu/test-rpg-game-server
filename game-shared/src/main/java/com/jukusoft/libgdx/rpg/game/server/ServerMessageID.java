@@ -1,7 +1,7 @@
 package com.jukusoft.libgdx.rpg.game.server;
 
 /**
- * Message IDs from server --> client
+ * Message IDs from server to client
  *
  * Created by Justin on 22.03.2017.
  */

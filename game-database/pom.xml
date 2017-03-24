@@ -27,6 +27,13 @@
             <version>${ini4j.version}</version>
         </dependency>
 
+        <!-- JSON library -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>${json.version}</version>
+        </dependency>
+
         <!-- hazelcast for JUnit tests -->
         <dependency>
             <groupId>com.hazelcast</groupId>

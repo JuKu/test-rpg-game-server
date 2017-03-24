@@ -48,8 +48,6 @@ public class DefaultMessageDistributor extends SimpleChannelInboundHandler<NetMe
                 //read bytes from discarded message
                 msg.content().readByte();
             }
-
-            return;
         } else {
             //call message receiver
             receiver.onReceive(ctx, attributes.getChannelID(), this.attributes, msg);

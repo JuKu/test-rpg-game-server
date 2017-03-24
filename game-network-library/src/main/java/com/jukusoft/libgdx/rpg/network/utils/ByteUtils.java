@@ -22,7 +22,7 @@ import java.nio.charset.StandardCharsets;
 public class ByteUtils
 {
 	/**
-	 * @param b
+	 * @param b byte
 	 * @return int
 	 */
 	public static int byteToInt(byte b) {
@@ -31,7 +31,7 @@ public class ByteUtils
 	}
 
 	/**
-	 * @param i
+	 * @param i integer number
 	 * @return int
 	 */
 	public static byte intToByte(int i) {
@@ -44,7 +44,7 @@ public class ByteUtils
 	/**
 	 * convert long to byte array
 	 *
-	 * @param x
+	 * @param x number
 	 * @return byte array
 	 */
 	public static byte[] longToBytes(long x)
@@ -58,7 +58,7 @@ public class ByteUtils
 	/**
 	 * convert byte array to long
 	 *
-	 * @param bytes
+	 * @param bytes byte array
 	 * @return long
 	 */
 	public static long bytesToLong(byte[] bytes)
@@ -73,7 +73,7 @@ public class ByteUtils
 	/**
 	 * convert integer to byte array
 	 *
-	 * @param x
+	 * @param x integer number
 	 * @return byte array
 	 */
 	public static byte[] intToBytes(int x)
@@ -88,8 +88,7 @@ public class ByteUtils
 	/**
 	 * convert byte array to integer
 	 *
-	 * @param bytes
-	 *            byte array
+	 * @param bytes byte array
 	 * @return x
 	 */
 	public static int bytesToInteger(byte[] bytes)
@@ -101,10 +100,10 @@ public class ByteUtils
 		return byteBuffer.getInt();
 	}
 
+	//@link http://stackoverflow.com/questions/2840190/java-convert-4-bytes-to-int
+
 	/**
 	* converts 4 bytes to integer
-	 *
-	 * @link http://stackoverflow.com/questions/2840190/java-convert-4-bytes-to-int
 	*/
 	public static int byteToInteger (byte b1, byte b2, byte b3, byte b4) {
 		return ((0xFF & b1) << 24) | ((0xFF & b2) << 16) |
@@ -114,7 +113,7 @@ public class ByteUtils
 	/**
 	 * convert char to byte
 	 *
-	 * @param c
+	 * @param c char
 	 * @return byte1
 	 */
 	public static byte charToByte(char c)
@@ -125,7 +124,7 @@ public class ByteUtils
 	/**
 	 * convert byte to char
 	 *
-	 * @param b
+	 * @param b byte
 	 * @return c
 	 */
 	public static char byteToChar(byte b)

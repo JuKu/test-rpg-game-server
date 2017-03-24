@@ -2,13 +2,17 @@ package com.jukusoft.libgdx.rpg.game.server.impl;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IdGenerator;
+import com.jukusoft.libgdx.rpg.database.user.UserRepository;
+import com.jukusoft.libgdx.rpg.database.user.impl.UserRepositoryImpl;
 import com.jukusoft.libgdx.rpg.game.client.ClientMessageID;
 import com.jukusoft.libgdx.rpg.game.server.GameServer;
 import com.jukusoft.libgdx.rpg.game.server.config.ServerConfig;
 import com.jukusoft.libgdx.rpg.game.server.handler.InitHandler;
 import com.jukusoft.libgdx.rpg.game.server.message.RTTMessageFactory;
 import com.jukusoft.libgdx.rpg.game.server.message.VersionMessageFactory;
+import com.jukusoft.libgdx.rpg.game.server.message.receiver.PlayerPosMessageReceiver;
 import com.jukusoft.libgdx.rpg.game.server.message.receiver.RTTResponseReceiver;
+import com.jukusoft.libgdx.rpg.game.server.message.receiver.UserAuthMessageReceiver;
 import com.jukusoft.libgdx.rpg.network.channel.ChannelAttributes;
 import com.jukusoft.libgdx.rpg.network.channel.ChannelAttributesManager;
 import com.jukusoft.libgdx.rpg.network.channel.impl.DefaultChannelAttributesManager;
@@ -42,6 +46,8 @@ public class DefaultGameServer extends NettyServer implements GameServer {
 
     protected ChannelAttributesManager channelAttributesManager = null;
 
+    protected UserRepository userRepository = null;
+
     public DefaultGameServer (HazelcastInstance hazelcastInstance, ServerConfig config) {
         super(DEFAULT_NUMBER_OF_BOSS_THREADS, DEFAULT_NUMBER_OF_WORKER_THREADS);
 
@@ -52,6 +58,8 @@ public class DefaultGameServer extends NettyServer implements GameServer {
         this.connIDGenerator = this.hazelcastInstance.getIdGenerator("connection-id-generator");
 
         this.channelAttributesManager = new DefaultChannelAttributesManager();
+
+        this.userRepository = new UserRepositoryImpl(hazelcastInstance);
     }
 
     @Override
@@ -116,6 +124,12 @@ public class DefaultGameServer extends NettyServer implements GameServer {
         RTTResponseReceiver rttResponseReceiver = new RTTResponseReceiver();
         messageDistributor.addReceiver(ClientMessageID.RTT_RESPONSE_EVENTID, rttResponseReceiver);
         messageDistributor.addReceiver(ClientMessageID.REQUEST_PING_CHECK_EVENTID, rttResponseReceiver);
+
+        PlayerPosMessageReceiver playerPosMessageReceiver = new PlayerPosMessageReceiver();
+        messageDistributor.addReceiver(ClientMessageID.SEND_PLAYER_POS_EVENTID, playerPosMessageReceiver);
+
+        UserAuthMessageReceiver userAuthMessageReceiver = new UserAuthMessageReceiver(this.userRepository);
+        messageDistributor.addReceiver(ClientMessageID.TRY_AUTH_USER_EVENTID, userAuthMessageReceiver);
 
         //add message distributor to pipeline
         pipeline.addLast("handler", messageDistributor);

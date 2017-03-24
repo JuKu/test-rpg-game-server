@@ -65,6 +65,8 @@ public class NetMessage extends DefaultByteBufHolder {
 
     /**
     * gets the sender timestamp of this message
+     *
+     * @return unix timestamp on which message was sended
     */
     public long getTimestamp () {
         return this.timestamp;

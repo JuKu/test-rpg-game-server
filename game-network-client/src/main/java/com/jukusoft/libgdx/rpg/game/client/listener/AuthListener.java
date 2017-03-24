@@ -6,6 +6,6 @@ package com.jukusoft.libgdx.rpg.game.client.listener;
 @FunctionalInterface
 public interface AuthListener {
 
-    public void onAuth (boolean success, int errorCode, String message);
+    public void onAuth (boolean success, int errorCode, long userID, String message);
 
 }

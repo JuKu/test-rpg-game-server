@@ -4,16 +4,15 @@ import com.jukusoft.libgdx.rpg.game.client.listener.AuthListener;
 import com.jukusoft.libgdx.rpg.game.client.message.PingCheckMessageFactory;
 import com.jukusoft.libgdx.rpg.game.client.message.PlayerPosMessageFactory;
 import com.jukusoft.libgdx.rpg.game.client.message.UserAuthMessageFactory;
+import com.jukusoft.libgdx.rpg.game.client.message.receiver.AuthResponseReceiver;
 import com.jukusoft.libgdx.rpg.game.client.message.receiver.RTTReceiver;
 import com.jukusoft.libgdx.rpg.game.server.ServerMessageID;
 import com.jukusoft.libgdx.rpg.network.channel.ChannelAttributes;
 import com.jukusoft.libgdx.rpg.network.channel.ClientChannelAttributes;
-import com.jukusoft.libgdx.rpg.network.message.MessageDistributor;
-import com.jukusoft.libgdx.rpg.network.message.NetMessage;
-import com.jukusoft.libgdx.rpg.network.message.NetMessageDecoder;
-import com.jukusoft.libgdx.rpg.network.message.NetMessageEncoder;
+import com.jukusoft.libgdx.rpg.network.message.*;
 import com.jukusoft.libgdx.rpg.network.message.impl.DefaultMessageDistributor;
 import com.jukusoft.libgdx.rpg.network.netty.NettyClient;
+import com.jukusoft.libgdx.rpg.network.utils.HashUtils;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
@@ -44,6 +43,19 @@ public class GameClient extends NettyClient {
         //add RTT receiver
         this.messageDistributor.addReceiver(ServerMessageID.RTT_MESSAGE_EVENTID, rttReceiver);
         this.messageDistributor.addReceiver(ServerMessageID.PING_INFO_EVENTID, rttReceiver);
+
+        //add auth response receiver
+        AuthResponseReceiver authResponseReceiver = new AuthResponseReceiver((boolean success, int errorCode, long userID, String message) -> {
+            System.out.println("auth response received (success: " + success + ", errorCode: " + errorCode + ").");
+
+            if (this.authListener != null) {
+                //call listener
+                this.authListener.onAuth(success, errorCode, userID, message);
+            } else {
+                throw new IllegalStateException("no auth listener registered.");
+            }
+        });
+        this.messageDistributor.addReceiver(ServerMessageID.AUTH_USER_RESPONSE_EVENTID, authResponseReceiver);
     }
 
     @Override protected void initPipeline(ChannelPipeline pipeline) {
@@ -66,6 +78,14 @@ public class GameClient extends NettyClient {
 
     public MessageDistributor<NetMessage> getMessageDistributor () {
         return this.messageDistributor;
+    }
+
+    public void addMessageReceiver (int eventID, MessageReceiver<NetMessage> receiver) {
+        this.getMessageDistributor().addReceiver(eventID, receiver);
+    }
+
+    public void removeMessageReceiver (int eventID) {
+        this.getMessageDistributor().removeReceiver(eventID);
     }
 
     public void send (NetMessage message) {
@@ -99,6 +119,9 @@ public class GameClient extends NettyClient {
         if (authListener == null) {
             throw new IllegalStateException("set authListener first.");
         }
+
+        //hash password
+        password = HashUtils.computePasswordSHAHash(password);
 
         System.out.println("try to authorize user '" + username + "'.");
 
