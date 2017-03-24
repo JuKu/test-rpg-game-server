@@ -59,7 +59,7 @@ public abstract class NettyClient implements Client {
     }
 
     @Override
-    public void connectAsync(String ip, int port) {
+    public ChannelFuture connectAsync(String ip, int port) {
         //connect to server
         ChannelFuture channelFuture = this.bootstrap.connect(ip, port);
 
@@ -75,6 +75,8 @@ public abstract class NettyClient implements Client {
                 channel = future.channel();
             }
         });
+
+        return channelFuture;
     }
 
     @Override public void close() {
