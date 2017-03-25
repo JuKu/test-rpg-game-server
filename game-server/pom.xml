@@ -12,7 +12,7 @@
     <artifactId>game-server</artifactId>
 
     <properties>
-        <mainClass>com.jukusoft.libgdx.rpg.game.server.GameServer</mainClass>
+        <mainClass>com.jukusoft.libgdx.rpg.game.server.ServerMain</mainClass>
     </properties>
 
     <dependencies>
