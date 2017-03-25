@@ -22,6 +22,7 @@ public class CharacterManager {
             character = new Character(userID, username);
 
             this.characterMap.put(userID, character);
+            this.characterList.add(character);
         }
 
         //update player position
