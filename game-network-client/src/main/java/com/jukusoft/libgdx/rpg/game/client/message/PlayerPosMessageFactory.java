@@ -1,6 +1,7 @@
 package com.jukusoft.libgdx.rpg.game.client.message;
 
 import com.jukusoft.libgdx.rpg.game.client.ClientMessageID;
+import com.jukusoft.libgdx.rpg.game.client.entry.CharacterPosEntry;
 import com.jukusoft.libgdx.rpg.network.message.NetMessage;
 import com.jukusoft.libgdx.rpg.network.utils.TimeUtils;
 import io.netty.buffer.ByteBuf;
@@ -11,7 +12,7 @@ import io.netty.buffer.Unpooled;
  */
 public class PlayerPosMessageFactory {
 
-    public static NetMessage createMessage (long sectorID, int layerID, long instanceID, float x, float y, float angle, float speed) {
+    public static NetMessage createMessage (long sectorID, int layerID, long instanceID, float x, float y, float angle, float speedX, float speedY) {
         ByteBuf byteBuf = Unpooled.buffer();
 
         //write sector coordinates
@@ -25,7 +26,28 @@ public class PlayerPosMessageFactory {
 
         //write velocity & direction
         byteBuf.writeFloat(angle);
-        byteBuf.writeFloat(speed);
+        byteBuf.writeFloat(speedX);
+        byteBuf.writeFloat(speedY);
+
+        return new NetMessage(ClientMessageID.SEND_PLAYER_POS_EVENTID, 1, TimeUtils.getCurrentTime(), byteBuf);
+    }
+
+    public static NetMessage createMessage (CharacterPosEntry character) {
+        ByteBuf byteBuf = Unpooled.buffer();
+
+        //write sector coordinates
+        byteBuf.writeLong(character.getSectorID());
+        byteBuf.writeInt(character.getLayerID());
+        byteBuf.writeLong(character.getInstanceID());
+
+        //write player position
+        byteBuf.writeFloat(character.getX());
+        byteBuf.writeFloat(character.getY());
+
+        //write velocity & direction
+        byteBuf.writeFloat(character.getAngle());
+        byteBuf.writeFloat(character.getSpeedX());
+        byteBuf.writeFloat(character.getSpeedY());
 
         return new NetMessage(ClientMessageID.SEND_PLAYER_POS_EVENTID, 1, TimeUtils.getCurrentTime(), byteBuf);
     }

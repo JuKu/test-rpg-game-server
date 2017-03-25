@@ -7,14 +7,14 @@
     <groupId>com.jukusoft</groupId>
     <artifactId>test-rpg-game-server</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.2-SNAPSHOT</version>
 
     <modules>
         <module>game-network-library</module>
         <module>game-database</module>
+        <module>game-shared</module>
         <module>game-server</module>
         <module>game-network-client</module>
-        <module>game-shared</module>
     </modules>
 
     <name>libgdx-test-rpg-game-server</name>

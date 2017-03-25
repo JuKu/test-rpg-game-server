@@ -24,7 +24,8 @@ public class PlayerPosMessageReceiver implements MessageReceiver<NetMessage> {
             float y = msg.content().readFloat();
 
             float angle = msg.content().readFloat();
-            float speed = msg.content().readFloat();
+            float speedX = msg.content().readFloat();
+            float speedY = msg.content().readFloat();
 
             System.out.println("player position received: " + x + ", y: " + y);
         } else {

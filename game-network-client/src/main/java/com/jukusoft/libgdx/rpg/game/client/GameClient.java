@@ -1,6 +1,8 @@
 package com.jukusoft.libgdx.rpg.game.client;
 
+import com.jukusoft.libgdx.rpg.game.client.entry.CharacterPosEntry;
 import com.jukusoft.libgdx.rpg.game.client.listener.AuthListener;
+import com.jukusoft.libgdx.rpg.game.client.listener.TickListener;
 import com.jukusoft.libgdx.rpg.game.client.message.PingCheckMessageFactory;
 import com.jukusoft.libgdx.rpg.game.client.message.PlayerPosMessageFactory;
 import com.jukusoft.libgdx.rpg.game.client.message.UserAuthMessageFactory;
@@ -14,10 +16,13 @@ import com.jukusoft.libgdx.rpg.network.message.*;
 import com.jukusoft.libgdx.rpg.network.message.impl.DefaultMessageDistributor;
 import com.jukusoft.libgdx.rpg.network.netty.NettyClient;
 import com.jukusoft.libgdx.rpg.network.utils.HashUtils;
+import com.jukusoft.libgdx.rpg.network.utils.TickUtils;
 import io.netty.channel.ChannelPipeline;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -30,6 +35,10 @@ public class GameClient extends NettyClient {
 
     protected AuthListener authListener = null;
     protected boolean authMessageReceived = false;
+
+    protected CharacterPosEntry characterPosEntry = new CharacterPosEntry();
+    protected List<TickListener> tickListenerList = new ArrayList<>();
+    protected List<TickListener> tmpList = new ArrayList<>();
 
     public GameClient(int nOfWorkerThreads) {
         super(nOfWorkerThreads);
@@ -60,6 +69,28 @@ public class GameClient extends NettyClient {
             }
         });
         this.messageDistributor.addReceiver(ServerMessageID.AUTH_USER_RESPONSE_EVENTID, authResponseReceiver);
+
+        //add player sync
+        this.addTickListener(new TickListener() {
+            @Override public void onTick(GameClient client, ChannelAttributes attributes) {
+                //send player position
+                sendPlayerPos();
+            }
+        });
+
+        //add tick listener
+        this.addTask(TickUtils.getTickLength(), () -> {
+            //only execute tick listeners, if client is authorized
+            if (!attributes.isAuth()) {
+                return;
+            }
+
+            synchronized (this.tickListenerList) {
+                this.tickListenerList.stream().forEach(listener -> {
+                    listener.onTick(this, attributes);
+                });
+            }
+        });
     }
 
     @Override protected void initPipeline(ChannelPipeline pipeline) {
@@ -109,10 +140,11 @@ public class GameClient extends NettyClient {
         this.send(PingCheckMessageFactory.createMessage());
     }
 
+    @Deprecated
     public void sendPlayerPosition (long sectorID, int layerID, long instanceID, float x, float y, float angle, float speed) {
         //System.out.println("send player position");
 
-        this.send(PlayerPosMessageFactory.createMessage(sectorID, layerID, instanceID, x, y, angle, speed));
+        this.send(PlayerPosMessageFactory.createMessage(sectorID, layerID, instanceID, x, y, angle, speed, speed));
     }
 
     public void setAuthListener (AuthListener listener) {
@@ -143,8 +175,28 @@ public class GameClient extends NettyClient {
         this.send(UserAuthMessageFactory.createMessage(username, password));
     }
 
+    public int getPing () {
+        return this.attributes.getPing();
+    }
+
+    public void updatePlayerPos (float x, float y, float angle, float speedX, float speedY) {
+        this.characterPosEntry.update(x, y, angle, speedX, speedY);
+    }
+
+    public void addTickListener (TickListener tickListener) {
+        this.tickListenerList.add(tickListener);
+    }
+
+    public void removeTickListener (TickListener tickListener) {
+        this.tickListenerList.remove(tickListener);
+    }
+
     public void addTask (long interval, Runnable runnable) {
         this.workerGroup.scheduleAtFixedRate(runnable, 0l, interval, TimeUnit.MILLISECONDS);
+    }
+
+    protected void sendPlayerPos () {
+        this.send(PlayerPosMessageFactory.createMessage(this.characterPosEntry));
     }
 
 }
