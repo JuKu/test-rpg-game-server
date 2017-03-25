@@ -43,7 +43,7 @@ public class AuthResponseReceiver implements MessageReceiver<NetMessage> {
         String message = ByteUtils.getStringFromBytes(messageBytes, StandardCharsets.UTF_8);
 
         if (success) {
-            attributes.setAuth();
+            attributes.setAuth(userID, "You");
         }
 
         //call listener

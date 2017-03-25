@@ -17,4 +17,6 @@ public class ServerMessageID {
 
     public static final int AUTH_USER_RESPONSE_EVENTID = 4;
 
+    public static final int PLAYER_SYNC_BROADCAST = 5;
+
 }

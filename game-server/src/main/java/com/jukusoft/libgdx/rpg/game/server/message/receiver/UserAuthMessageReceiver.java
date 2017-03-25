@@ -96,7 +96,7 @@ public class UserAuthMessageReceiver implements MessageReceiver<NetMessage> {
 
     protected void login (UserEntry user, ChannelAttributes attributes) {
         //set channel state to logged in
-        attributes.setAuth();
+        attributes.setAuth(user.getUserID(), user.getUsername());
 
         attributes.put("user", user);
         attributes.put("userID", user.getUserID());

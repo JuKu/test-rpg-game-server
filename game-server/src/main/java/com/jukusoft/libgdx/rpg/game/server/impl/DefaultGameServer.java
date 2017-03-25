@@ -7,7 +7,9 @@ import com.jukusoft.libgdx.rpg.database.user.impl.UserRepositoryImpl;
 import com.jukusoft.libgdx.rpg.game.client.ClientMessageID;
 import com.jukusoft.libgdx.rpg.game.server.GameServer;
 import com.jukusoft.libgdx.rpg.game.server.config.ServerConfig;
+import com.jukusoft.libgdx.rpg.game.server.game.CharacterManager;
 import com.jukusoft.libgdx.rpg.game.server.handler.InitHandler;
+import com.jukusoft.libgdx.rpg.game.server.message.PlayerPosBroadcastMessageFactory;
 import com.jukusoft.libgdx.rpg.game.server.message.RTTMessageFactory;
 import com.jukusoft.libgdx.rpg.game.server.message.VersionMessageFactory;
 import com.jukusoft.libgdx.rpg.game.server.message.receiver.PlayerPosMessageReceiver;
@@ -26,6 +28,8 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Created by Justin on 22.03.2017.
  */
@@ -35,7 +39,7 @@ public class DefaultGameServer extends NettyServer implements GameServer {
     protected static final int DEFAULT_NUMBER_OF_WORKER_THREADS = 1;
 
     //length of one tick in ms
-    public static final long TICK_LENGTH = 50;
+    public static final long TICK_LENGTH = 50l;
 
     protected HazelcastInstance hazelcastInstance = null;
     protected ServerConfig config = null;
@@ -47,6 +51,7 @@ public class DefaultGameServer extends NettyServer implements GameServer {
     protected ChannelAttributesManager channelAttributesManager = null;
 
     protected UserRepository userRepository = null;
+    protected CharacterManager characterManager = new CharacterManager();
 
     public DefaultGameServer (HazelcastInstance hazelcastInstance, ServerConfig config) {
         super(DEFAULT_NUMBER_OF_BOSS_THREADS, DEFAULT_NUMBER_OF_WORKER_THREADS);
@@ -56,9 +61,7 @@ public class DefaultGameServer extends NettyServer implements GameServer {
 
         //get ID generator
         this.connIDGenerator = this.hazelcastInstance.getIdGenerator("connection-id-generator");
-
         this.channelAttributesManager = new DefaultChannelAttributesManager();
-
         this.userRepository = new UserRepositoryImpl(hazelcastInstance);
     }
 
@@ -70,6 +73,11 @@ public class DefaultGameServer extends NettyServer implements GameServer {
         } else {
             this.startAsync(config.getPort());
         }
+
+        this.workerGroup.scheduleAtFixedRate(() -> {
+            //send player positions
+            this.sendBroadcastMessage(PlayerPosBroadcastMessageFactory.createMessage(this.characterManager));
+        }, 0l, TICK_LENGTH, TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -125,7 +133,7 @@ public class DefaultGameServer extends NettyServer implements GameServer {
         messageDistributor.addReceiver(ClientMessageID.RTT_RESPONSE_EVENTID, rttResponseReceiver);
         messageDistributor.addReceiver(ClientMessageID.REQUEST_PING_CHECK_EVENTID, rttResponseReceiver);
 
-        PlayerPosMessageReceiver playerPosMessageReceiver = new PlayerPosMessageReceiver();
+        PlayerPosMessageReceiver playerPosMessageReceiver = new PlayerPosMessageReceiver(this.characterManager);
         messageDistributor.addReceiver(ClientMessageID.SEND_PLAYER_POS_EVENTID, playerPosMessageReceiver);
 
         UserAuthMessageReceiver userAuthMessageReceiver = new UserAuthMessageReceiver(this.userRepository);

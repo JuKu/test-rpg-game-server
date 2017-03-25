@@ -1,6 +1,7 @@
 package com.jukusoft.libgdx.rpg.game.server.message.receiver;
 
 import com.jukusoft.libgdx.rpg.game.client.ClientMessageID;
+import com.jukusoft.libgdx.rpg.game.server.game.CharacterManager;
 import com.jukusoft.libgdx.rpg.network.channel.ChannelAttributes;
 import com.jukusoft.libgdx.rpg.network.message.MessageReceiver;
 import com.jukusoft.libgdx.rpg.network.message.NetMessage;
@@ -10,6 +11,12 @@ import io.netty.channel.ChannelHandlerContext;
  * Created by Justin on 23.03.2017.
  */
 public class PlayerPosMessageReceiver implements MessageReceiver<NetMessage> {
+
+    protected CharacterManager characterManager = null;
+
+    public PlayerPosMessageReceiver (CharacterManager characterManager) {
+        this.characterManager = characterManager;
+    }
 
     @Override public void onReceive(ChannelHandlerContext ctx, long connID, ChannelAttributes attributes,
         NetMessage msg) {
@@ -26,6 +33,13 @@ public class PlayerPosMessageReceiver implements MessageReceiver<NetMessage> {
             float angle = msg.content().readFloat();
             float speedX = msg.content().readFloat();
             float speedY = msg.content().readFloat();
+
+            String username = attributes.getUsername();
+
+            //get userID
+            long userID = attributes.getUserID();
+
+            this.characterManager.updatePos(userID, username, x, y, speedX, speedY);
 
             System.out.println("player position received: " + x + ", y: " + y);
         } else {

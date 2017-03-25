@@ -17,6 +17,8 @@ public class ChannelAttributes {
     protected AtomicBoolean isAuth = new AtomicBoolean(false);
     protected volatile long rtt = 0;
     protected volatile int ping = 0;
+    protected volatile long userID = 0;
+    protected String username = "";
 
     public ChannelAttributes (long connID) {
         this.connID = connID;
@@ -52,12 +54,22 @@ public class ChannelAttributes {
         return this.attrMap.get(key) != null;
     }
 
-    public void setAuth () {
+    public void setAuth (long userID, String username) {
+        this.userID = userID;
+        this.username = username;
         this.isAuth.set(true);
     }
 
     public boolean isAuth () {
         return this.isAuth.get();
+    }
+
+    public long getUserID () {
+        return this.userID;
+    }
+
+    public String getUsername () {
+        return this.username;
     }
 
     public void logout () {
