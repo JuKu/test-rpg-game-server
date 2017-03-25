@@ -35,8 +35,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class DefaultGameServer extends NettyServer implements GameServer {
 
-    protected static final int DEFAULT_NUMBER_OF_BOSS_THREADS = 1;
-    protected static final int DEFAULT_NUMBER_OF_WORKER_THREADS = 1;
+    protected static final int DEFAULT_NUMBER_OF_BOSS_THREADS = 2;
+    protected static final int DEFAULT_NUMBER_OF_WORKER_THREADS = 2;
 
     //length of one tick in ms
     public static final long TICK_LENGTH = 50l;
@@ -75,6 +75,8 @@ public class DefaultGameServer extends NettyServer implements GameServer {
         }
 
         this.workerGroup.scheduleAtFixedRate(() -> {
+            System.out.println("send player position broadcast message, clients: " + getAllChannels().size());
+
             //send player positions
             this.sendBroadcastMessage(PlayerPosBroadcastMessageFactory.createMessage(this.characterManager));
         }, 0l, TICK_LENGTH, TimeUnit.MILLISECONDS);

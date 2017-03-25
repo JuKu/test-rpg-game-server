@@ -13,10 +13,13 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.concurrent.GlobalEventExecutor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Justin on 22.03.2017.
  */
-public abstract class NettyServer<T extends ByteBufHolder> implements Server<T> {
+public abstract class NettyServer<T extends NetMessage> implements Server<T> {
 
     protected int nOfBossThreads = 1;
     protected int nOfWorkerThreads = 1;
@@ -34,6 +37,7 @@ public abstract class NettyServer<T extends ByteBufHolder> implements Server<T> 
     protected ChannelInitializationHandler channelInitializationHandler = null;
 
     protected ChannelGroup allChannels = null;
+    protected List<Channel> channelList = new ArrayList<>();
 
     public NettyServer (final int nOfBossThreads, final int nOfWorkerThreads) {
         this.nOfBossThreads = nOfBossThreads;
@@ -133,10 +137,29 @@ public abstract class NettyServer<T extends ByteBufHolder> implements Server<T> 
         return this.allChannels;
     }
 
+    public List<Channel> listChannels () {
+        return this.channelList;
+    }
+
     @Override
     public void sendBroadcastMessage (T message) {
         //send message to all clients
-        this.getAllChannels().writeAndFlush(message);
+        //this.getAllChannels().writeAndFlush(message);
+
+        List<Channel> closedChannels = new ArrayList<>();
+
+        for (Channel channel : this.channelList) {
+            if (channel.isOpen() && channel.isActive()) {
+                NetMessage message1 = message.clone();
+
+                message1.retain();
+                channel.writeAndFlush(message1);
+            } else {
+                closedChannels.add(channel);
+            }
+        }
+
+        channelList.removeAll(closedChannels);
     }
 
 }

@@ -30,6 +30,7 @@ public class ChannelInitializationHandler extends ChannelHandlerAdapter {
 
         //add channel to group
         this.server.getAllChannels().add(ctx.channel());
+        this.server.listChannels().add(ctx.channel());
 
         super.handlerAdded(ctx);
     }

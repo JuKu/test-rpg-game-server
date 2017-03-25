@@ -114,4 +114,9 @@ public class NetMessage extends DefaultByteBufHolder {
         return this.equals((NetMessage) obj);
     }
 
+    @Override
+    public NetMessage clone () {
+        return new NetMessage(eventID, version, timestamp, content().copy());
+    }
+
 }
