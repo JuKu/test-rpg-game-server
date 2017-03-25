@@ -22,6 +22,14 @@ public class CharacterPosEntry {
         this.username = username;
     }
 
+    public long getUserID () {
+        return this.userID;
+    }
+
+    public String getUsername () {
+        return this.username;
+    }
+
     public long getSectorID () {
         return sectorID;
     }
