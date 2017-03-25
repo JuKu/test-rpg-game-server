@@ -5,14 +5,22 @@ package com.jukusoft.libgdx.rpg.game.client.entry;
  */
 public class CharacterPosEntry {
 
-    protected long sectorID = 0;
-    protected int layerID = 0;
-    protected long instanceID = 0;
-    protected float x = 0;
-    protected float y = 0;
-    protected float angle = 0;
-    protected float speedX = 0;
-    protected float speedY = 0;
+    protected long userID = 0;
+    protected String username = "";
+
+    protected volatile long sectorID = 0;
+    protected volatile int layerID = 0;
+    protected volatile long instanceID = 0;
+    protected volatile float x = 0;
+    protected volatile float y = 0;
+    protected volatile float angle = 0;
+    protected volatile float speedX = 0;
+    protected volatile float speedY = 0;
+
+    public CharacterPosEntry (long userID, String username) {
+        this.userID = userID;
+        this.username = username;
+    }
 
     public long getSectorID () {
         return sectorID;

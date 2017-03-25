@@ -7,6 +7,7 @@ import com.jukusoft.libgdx.rpg.game.client.message.PingCheckMessageFactory;
 import com.jukusoft.libgdx.rpg.game.client.message.PlayerPosMessageFactory;
 import com.jukusoft.libgdx.rpg.game.client.message.UserAuthMessageFactory;
 import com.jukusoft.libgdx.rpg.game.client.message.receiver.AuthResponseReceiver;
+import com.jukusoft.libgdx.rpg.game.client.message.receiver.PlayerPosBroadcastMessageReceiver;
 import com.jukusoft.libgdx.rpg.game.client.message.receiver.RTTReceiver;
 import com.jukusoft.libgdx.rpg.game.server.AuthErrorCode;
 import com.jukusoft.libgdx.rpg.game.server.ServerMessageID;
@@ -36,9 +37,10 @@ public class GameClient extends NettyClient {
     protected AuthListener authListener = null;
     protected boolean authMessageReceived = false;
 
-    protected CharacterPosEntry characterPosEntry = new CharacterPosEntry();
+    protected CharacterPosEntry characterPosEntry = new CharacterPosEntry(0, "You");
     protected List<TickListener> tickListenerList = new ArrayList<>();
-    protected List<TickListener> tmpList = new ArrayList<>();
+
+    protected PlayerPosBroadcastMessageReceiver playerPosBroadcastMessageReceiver = null;
 
     public GameClient(int nOfWorkerThreads) {
         super(nOfWorkerThreads);
@@ -69,6 +71,10 @@ public class GameClient extends NettyClient {
             }
         });
         this.messageDistributor.addReceiver(ServerMessageID.AUTH_USER_RESPONSE_EVENTID, authResponseReceiver);
+
+        //add player position broadcast receiver
+        this.playerPosBroadcastMessageReceiver = new PlayerPosBroadcastMessageReceiver();
+        this.messageDistributor.addReceiver(ServerMessageID.PLAYER_SYNC_BROADCAST, playerPosBroadcastMessageReceiver);
 
         //add player sync
         this.addTickListener(new TickListener() {
@@ -189,6 +195,10 @@ public class GameClient extends NettyClient {
 
     public void removeTickListener (TickListener tickListener) {
         this.tickListenerList.remove(tickListener);
+    }
+
+    public List<CharacterPosEntry> listAllCharacters () {
+        return this.playerPosBroadcastMessageReceiver.listAllCharacters();
     }
 
     public void addTask (long interval, Runnable runnable) {
