@@ -70,6 +70,8 @@ public class UserAuthMessageReceiver implements MessageReceiver<NetMessage> {
 
                 this.login(user, attributes);
 
+                System.out.println("logged in user '" + username + "' (userID: " + user.getUserID() + " successful!");
+
                 //send auth successful message
                 ctx.writeAndFlush(UserAuthResponseMessageFactory.createMessage(true, AuthErrorCode.AUTH_SUCCESSFUL, user.getUserID(), "LOGIN_SUCCESSFUL"));
             } else {
@@ -77,6 +79,8 @@ public class UserAuthMessageReceiver implements MessageReceiver<NetMessage> {
                 if (user.checkPassword(password)) {
                     //login user
                     this.login(user, attributes);
+
+                    System.out.println("logged in user '" + username + "' (userID: " + user.getUserID() + " successful!");
 
                     //send auth successful message
                     ctx.writeAndFlush(UserAuthResponseMessageFactory.createMessage(true, AuthErrorCode.AUTH_SUCCESSFUL, user.getUserID(), "LOGIN_SUCCESSFUL"));
