@@ -195,7 +195,7 @@ public class GameClient extends NettyClient {
         this.workerGroup.scheduleAtFixedRate(runnable, 0l, interval, TimeUnit.MILLISECONDS);
     }
 
-    protected void sendPlayerPos () {
+    public void sendPlayerPos () {
         this.send(PlayerPosMessageFactory.createMessage(this.characterPosEntry));
     }
 

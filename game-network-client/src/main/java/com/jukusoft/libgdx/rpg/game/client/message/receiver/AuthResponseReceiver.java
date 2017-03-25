@@ -42,6 +42,10 @@ public class AuthResponseReceiver implements MessageReceiver<NetMessage> {
         //convert bytes to string
         String message = ByteUtils.getStringFromBytes(messageBytes, StandardCharsets.UTF_8);
 
+        if (success) {
+            attributes.setAuth();
+        }
+
         //call listener
         this.authListener.onAuth(success, errorCode, userID, message);
     }
